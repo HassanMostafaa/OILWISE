@@ -22,7 +22,7 @@ export const RegisterForm = () => {
   };
 
   return (
-    <div className="border border-gray-300 p-3 flex flex-col gap-4">
+    <div className="w-2xl m-10 border border-gray-300 p-3 flex flex-col gap-4">
       RegisterForm
       <form
         className="flex flex-col gap-2 justify-start items-start"
