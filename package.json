@@ -1,0 +1,31 @@
+{
+  "name": "OilWise",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:web": "turbo dev --filter=@oilwise/web --filter=@oilwise/backend",
+    "dev:admin": "turbo dev --filter=@oilwise/admin --filter=@oilwise/backend",
+    "dev:mobile": "turbo dev --filter=@oilwise/mobile --filter=@oilwise/backend",
+    "dev:backend": "turbo dev --filter=@oilwise/backend",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "convex:dashboard": "pnpm --filter @oilwise/backend exec convex dashboard"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.22.0",
+      "onFail": "download"
+    }
+  },
+  "type": "module",
+  "devDependencies": {
+    "turbo": "^2.10.11"
+  }
+}
