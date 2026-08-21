@@ -1,4 +1,4 @@
-import { api } from "@oilwise/backend/convex/_generated/api";
+import { api } from "@oilwise-v1/backend/convex/_generated/api";
 import { fetchQuery } from "convex/nextjs";
 import { FunctionArgs } from "convex/server";
 

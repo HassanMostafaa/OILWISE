@@ -1,7 +1,7 @@
 "use client";
 
-import { api } from "@oilwise/backend/convex/_generated/api";
-import type { Id } from "@oilwise/backend/convex/_generated/dataModel";
+import { api } from "@oilwise-v1/backend/convex/_generated/api";
+import type { Id } from "@oilwise-v1/backend/convex/_generated/dataModel";
 import { usePaginatedQuery } from "convex/react";
 import { deleteNumberByIdService } from "@/services/numbers/deleteNumberByIdService";
 import { Trash } from "lucide-react";

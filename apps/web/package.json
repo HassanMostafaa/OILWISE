@@ -1,5 +1,5 @@
 {
-  "name": "@oilwise/web",
+  "name": "@oilwise-v1/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,7 +8,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@oilwise/backend": "workspace:*",
+    "@oilwise-v1/backend": "workspace:*",
     "convex": "^1.44.0",
     "lucide": "^1.33.0",
     "lucide-react": "^1.33.0",
