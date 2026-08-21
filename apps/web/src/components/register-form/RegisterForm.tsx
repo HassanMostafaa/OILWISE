@@ -22,49 +22,47 @@ export const RegisterForm = () => {
   };
 
   return (
-    <div className="w-2xl m-10 border border-gray-300 p-3 flex flex-col gap-4">
-      RegisterForm
-      <form
-        className="flex flex-col gap-2 justify-start items-start"
-        onSubmit={registerForm.handleSubmit(async (data) => {
-          await handleSubmit(data);
-        })}
-      >
-        <div>
-          <input
-            {...registerForm.register("name", {
-              required: "Name is required",
-            })}
-            placeholder="Enter name"
-          />
+    <form
+      className="border border-gray-300 p-3 space-y-3"
+      onSubmit={registerForm.handleSubmit(async (data) => {
+        await handleSubmit(data);
+      })}
+    >
+      <h1>Register form</h1>
+      <div>
+        <input
+          {...registerForm.register("name", {
+            required: "Name is required",
+          })}
+          placeholder="Enter name"
+        />
 
-          <FormInputErrorMessage
-            message={registerForm?.formState?.errors?.name?.message}
-          />
-        </div>
+        <FormInputErrorMessage
+          message={registerForm?.formState?.errors?.name?.message}
+        />
+      </div>
 
-        <div>
-          <input
-            {...registerForm.register("email", {
-              required: "Email is required",
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Invalid email address",
-              },
-            })}
-            type="email"
-            placeholder="Enter email address"
-          />
+      <div>
+        <input
+          {...registerForm.register("email", {
+            required: "Email is required",
+            pattern: {
+              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+              message: "Invalid email address",
+            },
+          })}
+          type="email"
+          placeholder="Enter email address"
+        />
 
-          <FormInputErrorMessage
-            message={registerForm?.formState?.errors?.email?.message}
-          />
-        </div>
+        <FormInputErrorMessage
+          message={registerForm?.formState?.errors?.email?.message}
+        />
+      </div>
 
-        <button className="border px-4 py-2" type="submit">
-          Submit
-        </button>
-      </form>
-    </div>
+      <button className="border px-4 py-2" type="submit">
+        Submit
+      </button>
+    </form>
   );
 };
