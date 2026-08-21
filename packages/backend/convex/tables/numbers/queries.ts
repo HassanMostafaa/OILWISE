@@ -22,5 +22,7 @@ export const getAllNumberPaginated = query({
   args: {
     paginationOpts: paginationOptsValidator,
   },
-  handler: async (ctx, args) => {},
+  handler: async (ctx, args) => {
+    return ctx.db.query("numbers").order("desc").paginate(args.paginationOpts);
+  },
 });

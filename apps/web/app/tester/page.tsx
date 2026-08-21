@@ -15,7 +15,7 @@ export default function NextjsPage() {
       </div>
 
       {/* NumbersList */}
-      <NumbersList />
+      <NumbersList initialNumItems={5} />
     </div>
   );
 }
