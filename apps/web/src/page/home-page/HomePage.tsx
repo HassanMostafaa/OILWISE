@@ -36,6 +36,9 @@ export const HomePage = () => {
           <a href="/register" rel="noopener noreferrer">
             Register
           </a>
+          <a href="/tester" rel="noopener noreferrer">
+            Tester
+          </a>
         </div>
       </main>
     </div>

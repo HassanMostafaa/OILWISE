@@ -1,2 +1,53 @@
-node_modules
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment files (all environments and nested locations)
 .env
+.env.*
+!.env.example
+
+# Next.js build output & cache
+.next/
+out/
+build/
+dist/
+
+# Debug and execution logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testing & Coverage
+coverage/
+.cypress/
+cypress/videos/
+cypress/screenshots/
+
+# IDEs and Editors
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Lockfiles (Uncomment if you want to ignore pnpm-lock as listed in your prompt)
+/pnpm-lock.yaml
+pnpm-lock.yaml

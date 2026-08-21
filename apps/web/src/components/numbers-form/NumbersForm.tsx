@@ -11,30 +11,32 @@ const defaultValues = {
 };
 
 export const NumbersForm = () => {
-  const numbersForm = useForm({ defaultValues });
+  const numbersForm = useForm<INumbersFormValues>({ defaultValues });
 
   const handleSubmit = async (data: INumbersFormValues) => {
     await insertNumberService(data);
     numbersForm.clearErrors();
     numbersForm.reset();
+
+    // Focus the input field after resetting
+    setTimeout(() => {
+      numbersForm.setFocus("value");
+    }, 100);
   };
 
   return (
     <form
+      className="border border-gray-300 p-3 space-y-3"
       onSubmit={numbersForm.handleSubmit(async (data) => {
-        console.log({ data });
         if (data.value === undefined) return;
-
         await handleSubmit(data);
       })}
-      className="border border-gray-300 p-3 space-y-3"
     >
       <h1>Numbers form</h1>
-      <div>
+      <div className="space-y-1.5">
         <input
           type="number"
           placeholder="Number"
-          defaultValue={""}
           {...numbersForm.register("value", {
             required: "Number is required",
             valueAsNumber: true,
@@ -45,9 +47,7 @@ export const NumbersForm = () => {
         />
       </div>
 
-      <button className="border px-4 py-2" type="submit">
-        Submit
-      </button>
+      <button type="submit">Submit</button>
     </form>
   );
 };
