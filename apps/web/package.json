@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^7.7.9",
+    "@clerk/ui": "^1.30.6",
     "@oilwise-v1/backend": "workspace:*",
     "convex": "^1.44.0",
     "lucide": "^1.33.0",

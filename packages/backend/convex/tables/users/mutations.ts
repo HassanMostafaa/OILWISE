@@ -5,13 +5,12 @@ export const registerUserProfile = mutation({
   args: {
     name: v.string(),
     email: v.string(),
-    password: v.string(),
+    username: v.string(),
   },
 
   handler: async (ctx, args) => {
+    const { email, name, username } = args || {};
     const identity = await ctx.auth.getUserIdentity();
-
-    console.log({ identity });
 
     if (!identity) {
       throw new Error("Not authenticated");
@@ -30,18 +29,66 @@ export const registerUserProfile = mutation({
 
     return ctx.db.insert("users", {
       clerkUserId: identity.subject,
-      name: args.name,
-      email: args.email,
-      password: "****",
+      username,
+      email,
+      name,
     });
   },
 });
 
-// export const deleteUserById = mutation({
-//   args: {
-//     userId: v.id("users"),
-//   },
-//   handler: async (context, args) => {
-//     return context.db.delete(args.userId);
-//   },
-// });
+export const deleteUserById = mutation({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (context, args) => {
+    return context.db.delete(args.userId);
+  },
+});
+
+export const ensureUserProfile = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    const username =
+      typeof identity.username === "string" ? identity.username : "";
+
+    const email = typeof identity.email === "string" ? identity.email : "";
+
+    const name = typeof identity.name === "string" ? identity.name : undefined;
+
+    const hasImg =
+      typeof identity.has_img === "boolean" ? identity.has_img : false;
+
+    const imgUrl =
+      typeof identity.img_url === "string" ? identity.img_url : undefined;
+
+    const profile = {
+      clerkUserId: identity.subject,
+      username,
+      email,
+      name,
+      has_img: hasImg,
+      img_url: imgUrl,
+    };
+
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_user_id", (q) =>
+        q.eq("clerkUserId", identity.subject),
+      )
+      .unique();
+
+    if (existingUser) {
+      await ctx.db.patch(existingUser._id, profile);
+
+      return existingUser._id;
+    }
+
+    return ctx.db.insert("users", profile);
+  },
+});

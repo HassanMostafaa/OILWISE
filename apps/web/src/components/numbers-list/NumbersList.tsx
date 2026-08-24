@@ -24,7 +24,7 @@ export const NumbersList = ({
   };
 
   return (
-    <div className="flex-1 border p-2">
+    <div className="flex-1 space-y-3 border p-2">
       <h1>Numbers list</h1>
 
       <ul className="flex flex-col gap-2">
@@ -38,7 +38,6 @@ export const NumbersList = ({
           </li>
         ))}
       </ul>
-
       {status === "CanLoadMore" && (
         <button
           onClick={() => loadMore(initialNumItems)}
