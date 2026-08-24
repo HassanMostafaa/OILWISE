@@ -105,18 +105,6 @@ export const LoginForm = () => {
     //   </button>
     // </form>
 
-    <SignIn
-      appearance={{
-        variables: {
-          borderRadius: "0.5rem",
-        },
-
-        elements: {
-          card: "shadow-none border",
-          formButtonPrimary: "bg-black hover:bg-black/90",
-          formFieldInput: "border rounded-md",
-        },
-      }}
-    />
+    <SignIn />
   );
 };

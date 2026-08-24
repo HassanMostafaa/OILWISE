@@ -50,7 +50,9 @@ export const NumbersForm = () => {
         />
       </div>
 
-      <button type="submit">Submit</button>
+      <button className="border px-4 py-2" type="submit">
+        Submit
+      </button>
     </form>
   );
 };

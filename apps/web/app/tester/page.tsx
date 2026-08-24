@@ -12,37 +12,15 @@ export default async function NextjsPage() {
   await auth.protect();
 
   return (
-    <div className="p-2  w-full items-start justify-between flex gap-5 md:p-10">
-      <div className="flex-1 space-y-5">
-        <Show when="signed-in">
-          <p>clerk - SIGNED IN</p>
+    <div className="p-2 space-y-5 md:p-10">
+      <Show when="signed-in">
+        <p>clerk - SIGNED IN</p>
 
-          <SignOut />
+        <SignOut />
 
-          <NumbersForm />
-          <NumbersList initialNumItems={5} />
-
-          {/* <SessionAnalytics /> */}
-        </Show>
-
-        <Show when="signed-out">
-          <p>SIGNED OUT</p>
-          <RegisterForm />
-
-          <LoginForm />
-        </Show>
-
-        {/* <SignUp /> */}
-
-        {/* ONLY CLIENT */}
-        {/* <Authenticated>
-          <p>convex - SIGNED IN</p>
-          </Authenticated> */}
-        {/* 
-        <Unauthenticated>
-        <p>convex - SIGNED OUT</p>
-        </Unauthenticated> */}
-      </div>
+        <NumbersForm />
+        <NumbersList initialNumItems={5} />
+      </Show>
     </div>
   );
 }

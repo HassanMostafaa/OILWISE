@@ -34,6 +34,9 @@ export const NumbersList = ({
     return null;
   }
 
+  if (!results?.length || results?.length <= 0) {
+    return null;
+  }
   return (
     <div className="flex-1 space-y-3 border p-2">
       <h1>Numbers list</h1>
@@ -59,9 +62,9 @@ export const NumbersList = ({
         </button>
       )}
 
-      {status === "LoadingMore" && <span>Loading more...</span>}
+      {/* {status === "LoadingMore" && <span>Loading more...</span>} */}
 
-      {status === "Exhausted" && <span>Done</span>}
+      {/* {status === "Exhausted" && <span>Done</span>} */}
     </div>
   );
 };
