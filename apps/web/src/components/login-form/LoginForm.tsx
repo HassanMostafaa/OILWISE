@@ -1,8 +1,10 @@
 "use client";
-import React, { useState } from "react";
+
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FormInputErrorMessage } from "../form-input-error-message/FormInputErrorMessage";
+import { useSignIn } from "@clerk/nextjs";
 import { Eye, EyeClosed } from "lucide-react";
+import { FormInputErrorMessage } from "../form-input-error-message/FormInputErrorMessage";
 
 export interface ILoginFormValues {
   identifier: string;
@@ -15,54 +17,84 @@ const defaultValues: ILoginFormValues = {
 };
 
 export const LoginForm = () => {
-  const loginForm = useForm({ defaultValues });
-  const [hidePassword, setHidePassword] = useState<boolean>(true);
+  const form = useForm<ILoginFormValues>({ defaultValues });
+  const [hidePassword, setHidePassword] = useState(true);
 
-  const showHidePassword = () => {
-    setHidePassword((prev) => !prev);
+  const { signIn, fetchStatus, errors } = useSignIn();
+
+  const onSubmit = async ({ identifier, password }: ILoginFormValues) => {
+    const { error } = await signIn.password({
+      emailAddress: identifier,
+      password,
+    });
+
+    if (error) return;
+
+    if (signIn.status === "complete") {
+      await signIn.finalize({});
+    }
   };
+
   return (
     <form
-      className="  border border-gray-300 p-3 space-y-3"
-      onSubmit={loginForm.handleSubmit((data) => {
-        console.log({ data });
-      })}
+      className="border border-gray-300 p-3 space-y-3"
+      onSubmit={form.handleSubmit(onSubmit)}
     >
       <h1>Login form</h1>
-      {/* ID INPUT */}
+
       <div>
         <input
           type="text"
-          placeholder="Enter your username or email address"
-          {...loginForm.register("identifier", { required: "Required" })}
+          placeholder="Enter your email address"
+          {...form.register("identifier", {
+            required: "Email is required",
+          })}
         />
+
         <FormInputErrorMessage
-          message={loginForm?.formState?.errors?.identifier?.message}
+          message={
+            form.formState.errors.identifier?.message ??
+            errors?.fields?.identifier?.message
+          }
         />
       </div>
+
       <div className="relative">
         <input
-          className="w-full border pe-5!"
+          className="w-full border pe-8"
           type={hidePassword ? "password" : "text"}
           placeholder="Enter your password"
-          {...loginForm.register("password", { required: "Required" })}
+          {...form.register("password", {
+            required: "Password is required",
+          })}
         />
 
-        {hidePassword ? (
-          <Eye onClick={showHidePassword} className="absolute right-2 top-2" />
-        ) : (
-          <EyeClosed
-            className="absolute right-2 top-2"
-            onClick={showHidePassword}
-          />
-        )}
+        <button
+          type="button"
+          onClick={() => setHidePassword((prev) => !prev)}
+          className="absolute right-2 top-2"
+        >
+          {hidePassword ? (
+            <Eye className="h-4 w-4" />
+          ) : (
+            <EyeClosed className="h-4 w-4" />
+          )}
+        </button>
+
         <FormInputErrorMessage
-          message={loginForm?.formState?.errors?.password?.message}
+          message={
+            form.formState.errors.password?.message ??
+            errors?.fields?.password?.message
+          }
         />
       </div>
 
-      <button className="border px-4 py-2" type="submit">
-        Login
+      <button
+        className="border px-4 py-2"
+        type="submit"
+        disabled={fetchStatus === "fetching"}
+      >
+        {fetchStatus === "fetching" ? "Logging in..." : "Login"}
       </button>
     </form>
   );

@@ -6,13 +6,13 @@
   "main": "index.js",
   "scripts": {
     "dev": "turbo dev",
-    "dev:web": "turbo dev --filter=@oilwise/web --filter=@oilwise/backend",
-    "dev:admin": "turbo dev --filter=@oilwise/admin --filter=@oilwise/backend",
-    "dev:mobile": "turbo dev --filter=@oilwise/mobile --filter=@oilwise/backend",
-    "dev:backend": "turbo dev --filter=@oilwise/backend",
+    "dev:web": "turbo dev --filter=@oilwise-v1/web --filter=@oilwise-v1/backend",
+    "dev:admin": "turbo dev --filter=@oilwise/admin --filter=@oilwise-v1/backend",
+    "dev:mobile": "turbo dev --filter=@oilwise/mobile --filter=@oilwise-v1/backend",
+    "dev:backend": "turbo dev --filter=@oilwise-v1/backend",
     "build": "turbo build",
     "lint": "turbo lint",
-    "convex:dashboard": "pnpm --filter @oilwise/backend exec convex dashboard"
+    "convex:dashboard": "pnpm --filter @oilwise-v1/backend exec convex dashboard"
   },
   "keywords": [],
   "author": "",

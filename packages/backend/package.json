@@ -14,5 +14,8 @@
   "type": "module",
   "dependencies": {
     "convex": "^1.44.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43"
   }
 }
