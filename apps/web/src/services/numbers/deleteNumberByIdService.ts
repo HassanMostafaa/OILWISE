@@ -1,7 +1,10 @@
-import { api } from "@oilwise-v1/backend/convex/_generated/api";
-import { Id } from "@oilwise-v1/backend/convex/_generated/dataModel";
-import { fetchMutation } from "convex/nextjs";
+// services/numbers/useDeleteNumberByIdService.ts
 
-export const deleteNumberByIdService = async (id: Id<"numbers">) => {
-  return fetchMutation(api.tables.numbers.mutations.deleteNumberById, { id });
+"use client";
+
+import { useMutation } from "convex/react";
+import { api } from "@oilwise-v1/backend/convex/_generated/api";
+
+export const useDeleteNumberByIdService = () => {
+  return useMutation(api.tables.numbers.mutations.deleteNumberById);
 };

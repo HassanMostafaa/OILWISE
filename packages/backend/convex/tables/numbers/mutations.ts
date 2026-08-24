@@ -1,13 +1,20 @@
-import { numbers } from "./table";
 import { mutation } from "../../_generated/server";
 import { v } from "convex/values";
+
+import { getAuthenticatedUser } from "../../auth/getAuthenticatedUser";
 
 export const insertNumber = mutation({
   args: {
     value: v.number(),
   },
+
   handler: async (ctx, args) => {
-    return ctx.db.insert("numbers", args);
+    const user = await getAuthenticatedUser(ctx);
+
+    return ctx.db.insert("numbers", {
+      value: args.value,
+      userId: user._id,
+    });
   },
 });
 
@@ -15,29 +22,32 @@ export const deleteNumberById = mutation({
   args: {
     id: v.id("numbers"),
   },
+
   handler: async (ctx, args) => {
+    const user = await getAuthenticatedUser(ctx);
+
     const numberToDelete = await ctx.db.get(args.id);
+
     if (!numberToDelete) {
       return {
         success: false,
-        message: "Object with that id not found",
+        message: "Number not found",
+      };
+    }
+
+    if (numberToDelete.userId !== user._id) {
+      return {
+        success: false,
+        message: "User not authorized to delete that number",
       };
     }
 
     await ctx.db.delete(args.id);
 
-    const isNotDeleted = await ctx.db.get(args.id);
-    if (isNotDeleted) {
-      return {
-        success: false,
-        message: "Delete execution failed to remove value from database",
-      };
-    } else {
-      return {
-        success: true,
-        message: "",
-        deletedValue: numberToDelete,
-      };
-    }
+    return {
+      success: true,
+      message: "",
+      deletedValue: numberToDelete,
+    };
   },
 });

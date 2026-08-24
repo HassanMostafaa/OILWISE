@@ -2,8 +2,8 @@
 
 import { api } from "@oilwise-v1/backend/convex/_generated/api";
 import type { Id } from "@oilwise-v1/backend/convex/_generated/dataModel";
-import { usePaginatedQuery } from "convex/react";
-import { deleteNumberByIdService } from "@/services/numbers/deleteNumberByIdService";
+import { useConvexAuth, usePaginatedQuery } from "convex/react";
+import { useDeleteNumberByIdService } from "@/services/numbers/deleteNumberByIdService";
 import { Trash } from "lucide-react";
 
 export const NumbersList = ({
@@ -11,17 +11,28 @@ export const NumbersList = ({
 }: {
   initialNumItems: number;
 }) => {
-  const { results, status, loadMore, isLoading } = usePaginatedQuery(
-    api.tables.numbers.queries.getAllNumberPaginated,
-    {},
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
+  const deleteNumberByIdService = useDeleteNumberByIdService();
+
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.tables.numbers.queries.getMyNumbersPaginated,
+    isAuthenticated ? {} : "skip",
     {
       initialNumItems,
     },
   );
 
   const handleDelete = async (id: Id<"numbers">) => {
-    await deleteNumberByIdService(id);
+    await deleteNumberByIdService({ id });
   };
+
+  if (isAuthLoading) {
+    return <span>Authenticating...</span>;
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="flex-1 space-y-3 border p-2">
@@ -29,7 +40,7 @@ export const NumbersList = ({
 
       <ul className="flex flex-col gap-2">
         {results.map((number) => (
-          <li className="border flex justify-between p-2" key={number._id}>
+          <li key={number._id} className="flex justify-between border p-2">
             <span>{number.value}</span>
 
             <button onClick={() => handleDelete(number._id)}>
@@ -38,6 +49,7 @@ export const NumbersList = ({
           </li>
         ))}
       </ul>
+
       {status === "CanLoadMore" && (
         <button
           onClick={() => loadMore(initialNumItems)}
@@ -47,8 +59,7 @@ export const NumbersList = ({
         </button>
       )}
 
-      {status === "LoadingMore" && <span>Loading...</span>}
-      {isLoading && <span>Loading...</span>}
+      {status === "LoadingMore" && <span>Loading more...</span>}
 
       {status === "Exhausted" && <span>Done</span>}
     </div>

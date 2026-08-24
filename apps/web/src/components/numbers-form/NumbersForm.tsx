@@ -1,10 +1,10 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { FormInputErrorMessage } from "../form-input-error-message/FormInputErrorMessage";
-import { insertNumberService } from "@/services/numbers/insertNumberService";
+import { useInsertNumberService } from "@/services/numbers/insertNumberService";
 
 export interface INumbersFormValues {
-  value?: number;
+  value: number;
 }
 const defaultValues = {
   value: undefined,
@@ -12,8 +12,11 @@ const defaultValues = {
 
 export const NumbersForm = () => {
   const numbersForm = useForm<INumbersFormValues>({ defaultValues });
+  const insertNumberService = useInsertNumberService();
 
   const handleSubmit = async (data: INumbersFormValues) => {
+    if (!data.value) return;
+
     await insertNumberService(data);
     numbersForm.clearErrors();
     numbersForm.reset();

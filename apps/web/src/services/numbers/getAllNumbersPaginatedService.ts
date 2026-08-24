@@ -3,7 +3,7 @@ import { fetchQuery } from "convex/nextjs";
 import { FunctionArgs } from "convex/server";
 
 export const getAllNumbersPaginatedService = async (
-  args: FunctionArgs<typeof api.tables.numbers.queries.getAllNumberPaginated>,
+  args: FunctionArgs<typeof api.tables.numbers.queries.getMyNumbersPaginated>,
 ) => {
-  return fetchQuery(api.tables.numbers.queries.getAllNumberPaginated, args);
+  return fetchQuery(api.tables.numbers.queries.getMyNumbersPaginated, args);
 };

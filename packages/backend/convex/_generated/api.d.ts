@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as auth_getAuthenticatedUser from "../auth/getAuthenticatedUser.js";
 import type * as tables_numbers_mutations from "../tables/numbers/mutations.js";
 import type * as tables_numbers_queries from "../tables/numbers/queries.js";
 import type * as tables_numbers_table from "../tables/numbers/table.js";
@@ -22,6 +23,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "auth/getAuthenticatedUser": typeof auth_getAuthenticatedUser;
   "tables/numbers/mutations": typeof tables_numbers_mutations;
   "tables/numbers/queries": typeof tables_numbers_queries;
   "tables/numbers/table": typeof tables_numbers_table;
