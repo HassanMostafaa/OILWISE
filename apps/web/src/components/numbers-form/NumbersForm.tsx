@@ -2,12 +2,13 @@
 import { useForm } from "react-hook-form";
 import { FormInputErrorMessage } from "../form-input-error-message/FormInputErrorMessage";
 import { useInsertNumberService } from "@/services/numbers/insertNumberService";
+import { toast } from "sonner";
 
 export interface INumbersFormValues {
-  value: number;
+  value: string;
 }
 const defaultValues = {
-  value: undefined,
+  value: "",
 };
 
 export const NumbersForm = () => {
@@ -15,8 +16,6 @@ export const NumbersForm = () => {
   const insertNumberService = useInsertNumberService();
 
   const handleSubmit = async (data: INumbersFormValues) => {
-    if (!data.value) return;
-
     await insertNumberService(data);
     numbersForm.clearErrors();
     numbersForm.reset();
@@ -24,7 +23,8 @@ export const NumbersForm = () => {
     // Focus the input field after resetting
     setTimeout(() => {
       numbersForm.setFocus("value");
-    }, 100);
+      toast.success(`Value (${data.value}) is inserted`);
+    }, 50);
   };
 
   return (
@@ -38,11 +38,10 @@ export const NumbersForm = () => {
       <h1>Numbers form</h1>
       <div className="space-y-1.5">
         <input
-          type="number"
+          type="text"
           placeholder="Number"
           {...numbersForm.register("value", {
-            required: "Number is required",
-            valueAsNumber: true,
+            required: "Is required",
           })}
         />
         <FormInputErrorMessage

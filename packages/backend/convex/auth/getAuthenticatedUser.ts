@@ -1,11 +1,10 @@
-import type { QueryCtx, MutationCtx } from "../_generated/server";
+import type { GenericQueryCtx } from "convex/server";
+import type { DataModel } from "../_generated/dataModel";
 
-type AuthContext = QueryCtx | MutationCtx;
+type AuthContext = Pick<GenericQueryCtx<DataModel>, "auth" | "db">;
 
 export const getAuthenticatedUser = async (ctx: AuthContext) => {
   const identity = await ctx.auth.getUserIdentity();
-
-  console.log({ identity });
 
   if (!identity) {
     throw new Error("Not authenticated");

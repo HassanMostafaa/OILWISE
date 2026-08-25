@@ -1,6 +1,8 @@
 import { mutation } from "../../_generated/server";
 import { v } from "convex/values";
 
+type UserRole = "user" | "admin";
+
 export const registerUserProfile = mutation({
   args: {
     name: v.string(),
@@ -47,6 +49,7 @@ export const deleteUserById = mutation({
 
 export const ensureUserProfile = mutation({
   args: {},
+
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
 
@@ -67,6 +70,15 @@ export const ensureUserProfile = mutation({
     const imgUrl =
       typeof identity.img_url === "string" ? identity.img_url : undefined;
 
+    const metadata =
+      typeof identity.metadata === "object" &&
+      identity.metadata !== null &&
+      !Array.isArray(identity.metadata)
+        ? identity.metadata
+        : {};
+
+    const role: UserRole = metadata.role === "admin" ? "admin" : "user";
+
     const profile = {
       clerkUserId: identity.subject,
       username,
@@ -74,6 +86,7 @@ export const ensureUserProfile = mutation({
       name,
       has_img: hasImg,
       img_url: imgUrl,
+      role,
     };
 
     const existingUser = await ctx.db

@@ -1,11 +1,13 @@
 "use client";
 
-// apps/web/src/providers/AppProviders.tsx
 import { FunctionComponent, PropsWithChildren } from "react";
-import { ConvexClientProvider } from "./ConvexProvider";
 import { ClerkProvider } from "@clerk/nextjs";
-import { UserProfileSync } from "@/page/UserProfileSync";
 import { dark } from "@clerk/ui/themes";
+import { Toaster } from "sonner";
+
+import { ConvexClientProvider } from "./ConvexProvider";
+import { UserProfileSync } from "@/page/UserProfileSync";
+import { NotificationToastSync } from "./NotificationsToastSync";
 
 export const AppProviders: FunctionComponent<PropsWithChildren> = ({
   children,
@@ -18,7 +20,11 @@ export const AppProviders: FunctionComponent<PropsWithChildren> = ({
     >
       <ConvexClientProvider>
         <UserProfileSync />
+        <NotificationToastSync />
+
         {children}
+
+        <Toaster position="top-right" richColors closeButton />
       </ConvexClientProvider>
     </ClerkProvider>
   );

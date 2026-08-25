@@ -1,6 +1,7 @@
 import { Show, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { SignOut } from "../sign-out/SignOut";
+import { NotificationBell } from "../notification-bell/NotificationBell";
 
 export const HeaderNav = () => {
   return (
@@ -23,12 +24,15 @@ export const HeaderNav = () => {
         </Show>
       </div>
 
-      <Show when="signed-in">
-        <UserButton
-          showName
-          userProfileMode="navigation"
-          userProfileUrl="/profile"
-        />
+      <Show when="signed-in" fallback={null}>
+        <div className="flex gap-2 itemce">
+          <NotificationBell />
+          <UserButton
+            showName
+            userProfileMode="navigation"
+            userProfileUrl="/profile"
+          />
+        </div>
       </Show>
     </header>
   );

@@ -14,7 +14,7 @@ export const NumbersList = ({
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const deleteNumberByIdService = useDeleteNumberByIdService();
 
-  const { results, status, loadMore } = usePaginatedQuery(
+  const { results, status, loadMore, isLoading } = usePaginatedQuery(
     api.tables.numbers.queries.getMyNumbersPaginated,
     isAuthenticated ? {} : "skip",
     {
@@ -24,6 +24,10 @@ export const NumbersList = ({
 
   const handleDelete = async (id: Id<"numbers">) => {
     await deleteNumberByIdService({ id });
+
+    if (results?.length <= initialNumItems) {
+      loadMore(initialNumItems);
+    }
   };
 
   if (isAuthLoading) {
@@ -34,11 +38,12 @@ export const NumbersList = ({
     return null;
   }
 
-  if (!results?.length || results?.length <= 0) {
+  if ((!results?.length || results?.length <= 0) && status !== "CanLoadMore") {
     return null;
   }
+
   return (
-    <div className="flex-1 space-y-3 border p-2">
+    <div className="flex-1  space-y-3 border p-2">
       <h1>Numbers list</h1>
 
       <ul className="flex flex-col gap-2">
@@ -51,9 +56,10 @@ export const NumbersList = ({
             </button>
           </li>
         ))}
+        {isLoading && <span>Loading...</span>}
       </ul>
 
-      {status === "CanLoadMore" && (
+      {!isLoading && status === "CanLoadMore" && (
         <button
           onClick={() => loadMore(initialNumItems)}
           className="border p-2"

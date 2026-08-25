@@ -5,7 +5,7 @@ import { getAuthenticatedUser } from "../../auth/getAuthenticatedUser";
 
 export const insertNumber = mutation({
   args: {
-    value: v.number(),
+    value: v.string(),
   },
 
   handler: async (ctx, args) => {

@@ -9,6 +9,10 @@
  */
 
 import type * as auth_getAuthenticatedUser from "../auth/getAuthenticatedUser.js";
+import type * as notifications from "../notifications.js";
+import type * as notifications_api from "../notifications/api.js";
+import type * as notifications_client from "../notifications/client.js";
+import type * as notifications_mutations from "../notifications/mutations.js";
 import type * as tables_numbers_mutations from "../tables/numbers/mutations.js";
 import type * as tables_numbers_queries from "../tables/numbers/queries.js";
 import type * as tables_numbers_table from "../tables/numbers/table.js";
@@ -24,6 +28,10 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   "auth/getAuthenticatedUser": typeof auth_getAuthenticatedUser;
+  notifications: typeof notifications;
+  "notifications/api": typeof notifications_api;
+  "notifications/client": typeof notifications_client;
+  "notifications/mutations": typeof notifications_mutations;
   "tables/numbers/mutations": typeof tables_numbers_mutations;
   "tables/numbers/queries": typeof tables_numbers_queries;
   "tables/numbers/table": typeof tables_numbers_table;
@@ -58,4 +66,6 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  notification: import("convex-notification/_generated/component.js").ComponentApi<"notification">;
+};
