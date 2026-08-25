@@ -12,7 +12,7 @@ export default async function NextjsPage() {
   await auth.protect();
 
   return (
-    <div className="p-2 space-y-5 md:p-10">
+    <div className="p-2 w-2xl space-y-5 md:p-10">
       <Show when="signed-in">
         <p>clerk - SIGNED IN</p>
 

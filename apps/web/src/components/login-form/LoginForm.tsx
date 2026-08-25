@@ -5,7 +5,24 @@ import { useForm } from "react-hook-form";
 import { SignIn, useSignIn } from "@clerk/nextjs";
 import { Eye, EyeClosed } from "lucide-react";
 import { FormInputErrorMessage } from "../form-input-error-message/FormInputErrorMessage";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRedirectUrl } from "@/hooks/useRedirectUrl";
+import { handleSSOSignIn } from "@/services/auth/handleSSOSignIn";
+import { FaApple, FaGithub, FaGoogle } from "react-icons/fa";
+
+const ssoProviders = [
+  {
+    strategy: "oauth_google",
+    icon: FaGoogle,
+  },
+  {
+    strategy: "oauth_github",
+    icon: FaGithub,
+  },
+  {
+    strategy: "oauth_apple",
+    icon: FaApple,
+  },
+] as const;
 
 export interface ILoginFormValues {
   identifier: string;
@@ -21,10 +38,7 @@ export const LoginForm = () => {
   const form = useForm<ILoginFormValues>({ defaultValues });
   const [hidePassword, setHidePassword] = useState(true);
 
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get("redirect_url") ?? "/";
-  const handleRedirectBackToProtectedRoute = () => router.replace(redirectUrl);
+  const { redirectUrl, redirect } = useRedirectUrl();
 
   const { signIn, fetchStatus, errors } = useSignIn();
 
@@ -37,17 +51,40 @@ export const LoginForm = () => {
     if (error) return;
 
     if (signIn.status === "complete") {
-      await signIn.finalize({});
-      if (redirectUrl) handleRedirectBackToProtectedRoute();
+      await signIn.finalize();
+      redirect();
     }
   };
 
   return (
     // <form
-    //   className="border border-gray-300 p-3 space-y-3"
+    //   className="border max-w-2xl w-full border-gray-300 p-3 space-y-4"
     //   onSubmit={form.handleSubmit(onSubmit)}
     // >
-    //   <h1>Login form</h1>
+    //   <div className="flex gap-2 items-center justify-center">
+    //     {ssoProviders.map(({ strategy, icon: Icon }) => (
+    //       <button
+    //         key={strategy}
+    //         type="button"
+    //         className="border px-4 py-2 flex-1"
+    //         onClick={async () => {
+    //           handleSSOSignIn({
+    //             signIn,
+    //             strategy,
+    //             redirectUrl,
+    //           });
+    //         }}
+    //       >
+    //         <Icon className="size-4 mx-auto" />
+    //       </button>
+    //     ))}
+    //   </div>
+
+    //   <div className="flex items-center gap-3">
+    //     <div className="h-px flex-1 bg-gray-300" />
+    //     <span className="text-xs text-gray-500">OR</span>
+    //     <div className="h-px flex-1 bg-gray-300" />
+    //   </div>
 
     //   <div>
     //     <input
@@ -79,7 +116,7 @@ export const LoginForm = () => {
     //     <button
     //       type="button"
     //       onClick={() => setHidePassword((prev) => !prev)}
-    //       className="absolute right-2 top-2"
+    //       className="absolute right-2 top-1/2 -translate-y-1/2"
     //     >
     //       {hidePassword ? (
     //         <Eye className="h-4 w-4" />

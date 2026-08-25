@@ -48,8 +48,6 @@ export const getMyNumbersPaginated = query({
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
 
-    console.log({ user });
-
     return ctx.db
       .query("numbers")
       .withIndex("by_user_id", (q) => q.eq("userId", user._id))

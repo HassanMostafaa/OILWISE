@@ -1,5 +1,6 @@
 import { Show, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { SignOut } from "../sign-out/SignOut";
 
 export const HeaderNav = () => {
   return (
@@ -17,6 +18,8 @@ export const HeaderNav = () => {
           <Link href="/internal/dashboard">Dashboard</Link>
 
           <Link href="/tester">Tester</Link>
+
+          <SignOut />
         </Show>
       </div>
 

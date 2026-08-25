@@ -45,7 +45,6 @@ export const RegisterForm = () => {
     await signUp.finalize();
 
     const createUserRes = await createUserSvs(data);
-    console.log({ createUserRes });
   };
 
   return (
