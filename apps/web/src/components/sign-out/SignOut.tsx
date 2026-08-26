@@ -1,10 +1,13 @@
 "use client";
 
+// import { useDisableCurrentPushSubscription } from "@/hooks/useDisableCurrentPushSubscription";
 import { useClerk } from "@clerk/nextjs";
 
 export const SignOut = () => {
   const { signOut } = useClerk();
+  // const deletePushSubscription = useDisableCurrentPushSubscription();
   const handleSignOut = async () => {
+    // await deletePushSubscription();
     await signOut();
   };
 

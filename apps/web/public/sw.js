@@ -3,6 +3,7 @@ self.addEventListener("push", (event) => {
     title: "OILWISE",
     body: "New notification",
     url: "/",
+    action: null,
   };
 
   if (event.data) {
@@ -21,6 +22,7 @@ self.addEventListener("push", (event) => {
       body: data.body,
       data: {
         url: data.url,
+        action: data.action,
       },
     }),
   );
@@ -29,5 +31,7 @@ self.addEventListener("push", (event) => {
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
 
-  event.waitUntil(clients.openWindow(event.notification.data?.url ?? "/"));
+  const href = event.notification.data?.action?.href ?? "/";
+
+  event.waitUntil(clients.openWindow(href));
 });

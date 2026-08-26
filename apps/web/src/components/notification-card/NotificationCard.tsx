@@ -13,6 +13,11 @@ interface NotificationCardProps {
       mileage?: number;
       title?: string;
       userId?: string;
+
+      action: {
+        href: string;
+        label?: string;
+      };
     };
     isDismissed: boolean;
     isSeen: boolean;
@@ -113,6 +118,17 @@ export const NotificationCard = ({ notification }: NotificationCardProps) => {
           <Value>{formatDate(notification.seenAt)}</Value>
         </Field>
       </div>
+
+      {notification.data.action && (
+        <div className="flex gap-2 border-t pt-3">
+          <a
+            href={notification.data.action.href}
+            className="rounded-md border px-3 py-2 text-sm"
+          >
+            {notification.data.action.label ?? "Open"}
+          </a>
+        </div>
+      )}
 
       <div className="flex gap-2 border-t pt-3">
         {!notification.isSeen && (
