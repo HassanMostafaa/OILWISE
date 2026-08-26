@@ -1,28 +1,26 @@
 "use node";
 
 import webpush from "web-push";
-import { action } from "../_generated/server";
+
+import { internalAction } from "../_generated/server";
 import { internal } from "../_generated/api";
 import { v } from "convex/values";
+import { notificationAction } from "./client";
 
-export const sendTestPush = action({
+export const sendPushNotification = internalAction({
   args: {
     userId: v.id("users"),
     title: v.string(),
     message: v.string(),
+    action: notificationAction,
   },
 
   handler: async (
     ctx,
     args,
   ): Promise<{
-    subscriptionsFound: number;
-    results: Array<{
-      endpoint: string;
-      success: boolean;
-      statusCode?: number;
-      error?: string;
-    }>;
+    sent: number;
+    failed: number;
   }> => {
     const subject = process.env.VAPID_SUBJECT;
     const publicKey = process.env.VAPID_PUBLIC_KEY;
@@ -41,58 +39,31 @@ export const sendTestPush = action({
       },
     );
 
-    console.log("subscriptions found", subscriptions.length);
-
     const payload = JSON.stringify({
       title: args.title,
       body: args.message,
-      url: "/",
+      action: args.action,
     });
 
-    const results = await Promise.all(
-      subscriptions.map(async (subscription) => {
-        try {
-          const response = await webpush.sendNotification(
-            {
-              endpoint: subscription.endpoint,
-              keys: {
-                p256dh: subscription.p256dh,
-                auth: subscription.auth,
-              },
+    const results = await Promise.allSettled(
+      subscriptions.map((subscription) =>
+        webpush.sendNotification(
+          {
+            endpoint: subscription.endpoint,
+            keys: {
+              p256dh: subscription.p256dh,
+              auth: subscription.auth,
             },
-            payload,
-          );
-
-          console.log("push success", {
-            endpoint: subscription.endpoint,
-            statusCode: response.statusCode,
-          });
-
-          return {
-            endpoint: subscription.endpoint,
-            success: true,
-            statusCode: response.statusCode,
-          };
-        } catch (error) {
-          console.error("push failed", error);
-
-          return {
-            endpoint: subscription.endpoint,
-            success: false,
-            statusCode:
-              error instanceof webpush.WebPushError
-                ? error.statusCode
-                : undefined,
-            error:
-              error instanceof Error ? error.message : "Unknown push error",
-          };
-        }
-      }),
+          },
+          payload,
+        ),
+      ),
     );
 
     return {
-      subscriptionsFound: subscriptions.length,
-      results,
+      sent: results.filter((result) => result.status === "fulfilled").length,
+
+      failed: results.filter((result) => result.status === "rejected").length,
     };
   },
 });

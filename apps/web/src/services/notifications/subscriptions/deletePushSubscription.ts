@@ -5,12 +5,10 @@ import { api } from "@oilwise-v1/backend/convex/_generated/api";
 
 //   args: {
 // endpoint: v.string(),
-//   p256dh: v.string(),
-//   auth: v.string(),
 // },
 
-export const useSavePushSubscription = () => {
+export const useDeletePushSubscription = () => {
   return useMutation(
-    api.notifications.subscriptions.mutations.savePushSubscription,
+    api.notifications.subscriptions.mutations.deletePushSubscription,
   );
 };

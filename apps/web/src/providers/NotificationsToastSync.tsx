@@ -6,10 +6,12 @@ import { useAuth } from "@clerk/nextjs";
 import { useConvexAuth, useQuery } from "convex/react";
 
 import { api } from "@oilwise-v1/backend/convex/_generated/api";
+import { useRouter } from "next/navigation";
 
 export const NotificationToastSync = () => {
   const { userId } = useAuth();
   const { isAuthenticated } = useConvexAuth();
+  const router = useRouter();
 
   const notifications = useQuery(
     api.notifications.list,
@@ -50,9 +52,18 @@ export const NotificationToastSync = () => {
 
       toast.info(notification.data.title, {
         description: notification.data.message,
+
+        action: notification.data.action
+          ? {
+              label: notification.data.action.label ?? "View",
+              onClick: () => {
+                router.push(notification.data.action!.href);
+              },
+            }
+          : undefined,
       });
     });
-  }, [notifications, userId]);
+  }, [notifications, userId, router]);
 
   return null;
 };

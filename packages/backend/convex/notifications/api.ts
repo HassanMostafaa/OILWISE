@@ -1,11 +1,15 @@
 import { makeNotificationAPI } from "convex-notification/server";
+
 import { notifications } from "./client";
-import { getAuthenticatedUser } from "../auth/getAuthenticatedUser";
 
 export const userNotifications = makeNotificationAPI(notifications, {
   resolveTargetId: async (ctx) => {
-    const user = await getAuthenticatedUser(ctx as any);
+    const identity = await ctx.auth.getUserIdentity();
 
-    return user._id;
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    return identity.subject;
   },
 });

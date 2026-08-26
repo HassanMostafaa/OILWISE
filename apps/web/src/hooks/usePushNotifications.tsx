@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { useSavePushSubscription } from "@/services/notifications/subscriptions/savePushSubscription";
 import { urlBase64ToUint8Array } from "@/utils/urlBase64ToUint8Array";
+import { useDeletePushSubscription } from "@/services/notifications/subscriptions/deletePushSubscription";
 
 type RegistrationStatus =
   | "checking"
@@ -23,6 +24,7 @@ const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "";
 
 export const usePushNotifications = () => {
   const savePushSubscription = useSavePushSubscription();
+  const deletePushSubscription = useDeletePushSubscription();
 
   const [permission, setPermission] = useState<NotificationPermission>(
     typeof Notification !== "undefined" ? Notification.permission : "default",
@@ -205,7 +207,13 @@ export const usePushNotifications = () => {
       return;
     }
 
+    const endpoint = existingSubscription.endpoint;
+
     await existingSubscription.unsubscribe();
+
+    await deletePushSubscription({
+      endpoint,
+    });
 
     setSubscription(null);
     setSubscriptionStatus("unsubscribed");
