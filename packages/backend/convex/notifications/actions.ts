@@ -35,7 +35,7 @@ export const sendTestPush = action({
     webpush.setVapidDetails(subject, publicKey, privateKey);
 
     const subscriptions = await ctx.runQuery(
-      internal.pushNotifications.internalQueries.getSubscriptionsByUserId,
+      internal.notifications.internalQueries.getSubscriptionsByUserId,
       {
         userId: args.userId,
       },

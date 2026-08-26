@@ -10,9 +10,9 @@ export const getSubscriptionsByUserId = internalQuery({
   handler: async (
     ctx,
     args,
-  ): Promise<Doc<"pushNotificationsSubscriptions">[]> => {
+  ): Promise<Doc<"pushSubscriptions">[]> => {
     return ctx.db
-      .query("pushNotificationsSubscriptions")
+      .query("pushSubscriptions")
       .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
       .collect();
   },

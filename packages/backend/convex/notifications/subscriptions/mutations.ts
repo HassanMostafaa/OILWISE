@@ -13,7 +13,7 @@ export const savePushSubscription = mutation({
     const user = await getAuthenticatedUser(ctx);
 
     const existingSubscription = await ctx.db
-      .query("pushNotificationsSubscriptions")
+      .query("pushSubscriptions")
       .withIndex("by_endpoint", (q) => q.eq("endpoint", args.endpoint))
       .unique();
 
@@ -27,7 +27,7 @@ export const savePushSubscription = mutation({
       return existingSubscription._id;
     }
 
-    return ctx.db.insert("pushNotificationsSubscriptions", {
+    return ctx.db.insert("pushSubscriptions", {
       userId: user._id,
       endpoint: args.endpoint,
       p256dh: args.p256dh,

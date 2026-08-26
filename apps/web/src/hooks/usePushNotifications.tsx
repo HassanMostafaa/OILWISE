@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { useSavePushSubscription } from "@/services/push-notifications-subscription/savePushSubscription";
+import { useSavePushSubscription } from "@/services/notifications/subscriptions/savePushSubscription";
 import { urlBase64ToUint8Array } from "@/utils/urlBase64ToUint8Array";
 
 type RegistrationStatus =

@@ -1,7 +1,7 @@
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
 
-export const pushNotificationsSubscriptions = defineTable({
+export const pushSubscriptions = defineTable({
   userId: v.id("users"),
 
   endpoint: v.string(),

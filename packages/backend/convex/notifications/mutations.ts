@@ -1,8 +1,8 @@
-import { metadata } from "./../../../../apps/web/app/layout";
 import { v } from "convex/values";
 import { internalMutation, mutation } from "../_generated/server";
 import { getAuthenticatedUser } from "../auth/getAuthenticatedUser";
 import { notifications } from "./client";
+
 export const sendNotification = mutation({
   args: {
     userId: v.id("users"),
