@@ -2,21 +2,17 @@ import { Show, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { SignOut } from "../sign-out/SignOut";
 import { NotificationBell } from "../notification-bell/NotificationBell";
+import { User, UserPlus } from "lucide-react";
+import { DashboardAccess } from "../dashboard-access/DashboardAccess";
 
-export const HeaderNav = () => {
+export const HeaderNav = async () => {
   return (
     <header className="flex justify-between items-center p-5">
       <div className="flex gap-6 underline items-center">
         <Link href="/">Home</Link>
 
-        <Show when="signed-out">
-          <Link href="/sign-in">Sign in</Link>
-
-          <Link href="/sign-up">Sign up</Link>
-        </Show>
-
         <Show when="signed-in">
-          <Link href="/internal/dashboard">Dashboard</Link>
+          <DashboardAccess />
 
           <Link href="/tester">Tester</Link>
 
@@ -32,6 +28,21 @@ export const HeaderNav = () => {
             userProfileMode="navigation"
             userProfileUrl="/profile"
           />
+        </div>
+      </Show>
+
+      <Show when="signed-out">
+        <div className="flex gap-4 items-center">
+          <Link className="flex click items-center gap-2" href="/sign-up">
+            Sign up
+            <UserPlus />
+          </Link>
+          <Link
+            href="/sign-in"
+            className="flex gap-2 click items-center rounded-full px-2!"
+          >
+            <User />
+          </Link>
         </div>
       </Show>
     </header>

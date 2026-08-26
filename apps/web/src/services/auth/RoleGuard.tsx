@@ -1,27 +1,27 @@
 import "server-only";
 
+import type { ReactNode } from "react";
 import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-// import { redirect } from "next/navigation";
-// import type { Role } from "@/services/auth/roles";
+import { isRole, type Role } from "@/services/auth/roles";
 
 interface RoleGuardProps {
-  roles: string[];
-  children: React.ReactNode;
+  roles: Role[];
+  children: ReactNode;
 }
 
 export const RoleGuard = async ({ roles, children }: RoleGuardProps) => {
-  const { sessionClaims, redirectToSignIn } = await auth();
+  const { isAuthenticated, sessionClaims, redirectToSignIn } = await auth();
 
-  if (!sessionClaims) {
+  if (!isAuthenticated) {
     return redirectToSignIn();
   }
 
-  const role = sessionClaims.metadata?.role;
+  const role = sessionClaims?.metadata?.role;
 
-  if (!role || !roles.includes(role)) {
-    // redirect("/");
-    return "You are not authorized to view this page";
+  if (!isRole(role) || !roles.includes(role)) {
+    redirect("/");
   }
 
   return children;
