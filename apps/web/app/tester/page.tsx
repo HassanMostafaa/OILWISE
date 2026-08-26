@@ -1,5 +1,6 @@
 import { NumbersForm } from "@/components/numbers-form/NumbersForm";
 import { NumbersList } from "@/components/numbers-list/NumbersList";
+import { PushNotificationTester } from "@/components/push-notification-tester/PushNotificationTester";
 
 import { Show } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
@@ -12,6 +13,10 @@ export default async function NextjsPage() {
       <Show when="signed-in">
         <NumbersForm />
         <NumbersList initialNumItems={5} />
+
+        <hr />
+
+        <PushNotificationTester />
       </Show>
     </div>
   );
