@@ -1,13 +1,26 @@
 self.addEventListener("push", (event) => {
-  const data = event.data?.json() ?? {};
+  let data = {
+    title: "OILWISE",
+    body: "New notification",
+    url: "/",
+  };
+
+  if (event.data) {
+    try {
+      data = {
+        ...data,
+        ...event.data.json(),
+      };
+    } catch {
+      data.body = event.data.text();
+    }
+  }
 
   event.waitUntil(
-    self.registration.showNotification(data.title ?? "OILWISE", {
-      body: data.body ?? "New notification",
-      icon: "/icon-192.png",
-      badge: "/badge.png",
+    self.registration.showNotification(data.title, {
+      body: data.body,
       data: {
-        url: data.url ?? "/",
+        url: data.url,
       },
     }),
   );

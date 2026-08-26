@@ -1,53 +1,119 @@
 "use client";
 
 import { usePushNotifications } from "@/hooks/usePushNotifications";
-import { useState } from "react";
 
 export const PushNotificationTester = () => {
   const {
     permission,
     registrationStatus,
-    enablePushNotifications,
-    disablePushNotifications,
+    subscriptionStatus,
+
+    requestNotificationPermission,
+
+    registerServiceWorker,
+    unregisterServiceWorker,
+
+    subscribeToPush,
+    unsubscribeFromPush,
+
+    sendTestNotification,
   } = usePushNotifications();
 
-  const [requestPermission, setRequestPermission] = useState("default");
-
   return (
-    <div className="space-y-3 border p-4">
-      <p>
-        Permission: <strong>{permission}</strong>
-      </p>
+    <div className="space-y-6 border p-4">
+      <section className="space-y-2 border p-3">
+        <h2 className="font-semibold">1. Browser permission</h2>
 
-      <p>
-        Service worker: <strong>{registrationStatus}</strong>
-      </p>
-
-      <div className="flex gap-2">
-        <button
-          type="button"
-          className="border px-3 py-2"
-          onClick={async () => {
-            const { permission: enablePermission } =
-              await enablePushNotifications();
-
-            setRequestPermission(enablePermission);
-          }}
-        >
-          Enable
-          {requestPermission !== "default" && (
-            <span> ({requestPermission})</span>
-          )}
-        </button>
+        <p>
+          Permission: <strong>{permission}</strong>
+        </p>
 
         <button
           type="button"
           className="border px-3 py-2"
-          onClick={disablePushNotifications}
+          disabled={permission === "granted"}
+          onClick={requestNotificationPermission}
         >
-          Disable
+          Request permission
         </button>
-      </div>
+      </section>
+
+      <section className="space-y-2 border p-3">
+        <h2 className="font-semibold">2. Service worker</h2>
+
+        <p>
+          Status: <strong>{registrationStatus}</strong>
+        </p>
+
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className="border px-3 py-2"
+            disabled={
+              permission !== "granted" || registrationStatus === "registered"
+            }
+            onClick={registerServiceWorker}
+          >
+            Register
+          </button>
+
+          <button
+            type="button"
+            className="border px-3 py-2"
+            disabled={registrationStatus !== "registered"}
+            onClick={unregisterServiceWorker}
+          >
+            Unregister
+          </button>
+        </div>
+      </section>
+
+      <section className="space-y-2 border p-3">
+        <h2 className="font-semibold">3. Push subscription</h2>
+
+        <p>
+          Status: <strong>{subscriptionStatus}</strong>
+        </p>
+
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className="border px-3 py-2"
+            disabled={
+              permission !== "granted" ||
+              registrationStatus !== "registered" ||
+              subscriptionStatus === "subscribed"
+            }
+            onClick={subscribeToPush}
+          >
+            Subscribe
+          </button>
+
+          <button
+            type="button"
+            className="border px-3 py-2"
+            disabled={subscriptionStatus !== "subscribed"}
+            onClick={unsubscribeFromPush}
+          >
+            Unsubscribe
+          </button>
+        </div>
+      </section>
+
+      <section className="space-y-2 border p-3">
+        <h2 className="font-semibold">Test notification</h2>
+
+        <button
+          type="button"
+          className="border px-3 py-2"
+          disabled={
+            permission !== "granted" || registrationStatus !== "registered"
+          }
+          onClick={sendTestNotification}
+        >
+          Send test notification
+        </button>
+      </section>
     </div>
   );
 };
