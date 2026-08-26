@@ -1,14 +1,14 @@
-// providers/NotificationToastSync.tsx
-
 "use client";
 
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@clerk/nextjs";
 import { useConvexAuth, useQuery } from "convex/react";
 
 import { api } from "@oilwise-v1/backend/convex/_generated/api";
 
 export const NotificationToastSync = () => {
+  const { userId } = useAuth();
   const { isAuthenticated } = useConvexAuth();
 
   const notifications = useQuery(
@@ -19,35 +19,40 @@ export const NotificationToastSync = () => {
   const initialized = useRef(false);
   const seenNotifications = useRef(new Set<string>());
 
+  // New account = new baseline
   useEffect(() => {
-    if (!notifications) return;
+    initialized.current = false;
+    seenNotifications.current.clear();
+  }, [userId]);
 
-    const getNotificationKey = (notification: unknown) =>
-      JSON.stringify(notification);
+  useEffect(() => {
+    if (!notifications || !userId) return;
 
-    // Initial load:
-    // remember existing notifications without showing old toasts.
+    // First load for this user:
+    // remember everything without showing toasts.
     if (!initialized.current) {
       notifications.forEach((notification) => {
-        seenNotifications.current.add(getNotificationKey(notification));
+        seenNotifications.current.add(notification._id);
       });
 
       initialized.current = true;
       return;
     }
 
+    // Subsequent updates:
+    // only toast notifications we haven't seen before.
     notifications.forEach((notification) => {
-      const key = getNotificationKey(notification);
+      if (seenNotifications.current.has(notification._id)) {
+        return;
+      }
 
-      if (seenNotifications.current.has(key)) return;
-
-      seenNotifications.current.add(key);
+      seenNotifications.current.add(notification._id);
 
       toast.info(notification.data.title, {
         description: notification.data.message,
       });
     });
-  }, [notifications]);
+  }, [notifications, userId]);
 
   return null;
 };
