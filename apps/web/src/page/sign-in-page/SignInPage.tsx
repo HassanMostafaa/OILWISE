@@ -1,13 +1,14 @@
+"use client";
 import { LoginForm } from "@/components/login-form/LoginForm";
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 
-export const SignInPage = async () => {
-  const { isAuthenticated } = await auth();
+import { useAuth } from "@clerk/nextjs";
 
-  if (isAuthenticated) {
-    redirect("/profile");
+export const SignInPage = () => {
+  const { isSignedIn, userId } = useAuth();
+
+  if (!isSignedIn) {
+    return <LoginForm />;
   }
 
-  return <LoginForm />;
+  return <>{JSON.stringify({ isSignedIn, userId })}</>;
 };

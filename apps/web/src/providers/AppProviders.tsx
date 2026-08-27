@@ -7,8 +7,8 @@ import { Toaster } from "sonner";
 
 import { ConvexClientProvider } from "./ConvexProvider";
 import { UserProfileSync } from "@/page/UserProfileSync";
-import { NotificationToastSync } from "./NotificationsToastSync";
-// import { PushSubscriptionSync } from "./PushSubscriptionSync";
+import { NotificationToast } from "./NotificationsToast";
+import { ServiceWorkerProvider } from "./ServiceWokerProvider";
 
 export const AppProviders: FunctionComponent<PropsWithChildren> = ({
   children,
@@ -23,7 +23,8 @@ export const AppProviders: FunctionComponent<PropsWithChildren> = ({
         {children}
 
         <UserProfileSync />
-        <NotificationToastSync />
+        <NotificationToast />
+        <ServiceWorkerProvider />
         <Toaster position="top-right" richColors closeButton />
       </ConvexClientProvider>
     </ClerkProvider>

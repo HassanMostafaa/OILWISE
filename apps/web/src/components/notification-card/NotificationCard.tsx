@@ -3,31 +3,9 @@
 import moment from "moment";
 import { useMutation } from "convex/react";
 import { api } from "@oilwise-v1/backend/convex/_generated/api";
+import { FunctionReturnType } from "convex/server";
 
-interface NotificationCardProps {
-  notification: {
-    _id: string;
-    createdAt: number;
-    data: {
-      message?: string;
-      mileage?: number;
-      title?: string;
-      userId?: string;
-
-      action: {
-        href: string;
-        label?: string;
-      };
-    };
-    isDismissed: boolean;
-    isSeen: boolean;
-    kind: string;
-    seenAt?: number;
-    sequence: number;
-    targetId: string;
-    updatedAt?: number;
-  };
-}
+type INotification = FunctionReturnType<typeof api.notifications.list>[number];
 
 const formatDate = (timestamp?: number) => {
   if (!timestamp) return "—";
@@ -39,7 +17,7 @@ const Value = ({ children }: { children: React.ReactNode }) => (
   <span className="break-all text-sm text-gray-400">{children ?? "—"}</span>
 );
 
-export const NotificationCard = ({ notification }: NotificationCardProps) => {
+export const NotificationCard = (notification: INotification) => {
   const markSeen = useMutation(api.notifications.markSeen);
   const dismiss = useMutation(api.notifications.dismiss);
 
@@ -56,8 +34,8 @@ export const NotificationCard = ({ notification }: NotificationCardProps) => {
   };
 
   return (
-    <article className="space-y-4 h-full rounded-xl border p-4">
-      <div className="flex items-center  justify-between gap-4">
+    <article className="border space-y-6 p-5 bg-gray-900 flex-1 min-w-2xl">
+      <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-xs uppercase text-gray-500">{notification.kind}</p>
 
@@ -119,17 +97,6 @@ export const NotificationCard = ({ notification }: NotificationCardProps) => {
         </Field>
       </div>
 
-      {notification.data.action && (
-        <div className="flex gap-2 border-t pt-3">
-          <a
-            href={notification.data.action.href}
-            className="rounded-md border px-3 py-2 text-sm"
-          >
-            {notification.data.action.label ?? "Open"}
-          </a>
-        </div>
-      )}
-
       <div className="flex gap-2 border-t pt-3">
         {!notification.isSeen && (
           <button
@@ -149,6 +116,14 @@ export const NotificationCard = ({ notification }: NotificationCardProps) => {
           >
             Dismiss
           </button>
+        )}
+        {notification.data?.action?.label && (
+          <a
+            href={notification.data.action.href}
+            className="rounded-md border px-3 py-2 text-sm"
+          >
+            {notification.data.action.label}
+          </a>
         )}
       </div>
     </article>

@@ -11,17 +11,11 @@ export const notificationAction = v.optional(
 
 export const notifications = defineNotifications(components.notification, {
   kinds: {
-    mileage_reminder: v.object({
+    reminder: v.object({
       title: v.string(),
       userId: v.id("users"),
       mileage: v.number(),
       message: v.optional(v.string()),
-      action: notificationAction,
-    }),
-
-    admin_broadcast: v.object({
-      title: v.string(),
-      message: v.string(),
       action: notificationAction,
     }),
   },

@@ -5,6 +5,7 @@ import webpush from "web-push";
 import { internalAction } from "../_generated/server";
 import { internal } from "../_generated/api";
 import { v } from "convex/values";
+
 import { notificationAction } from "./client";
 
 export const sendPushNotification = internalAction({
@@ -32,8 +33,9 @@ export const sendPushNotification = internalAction({
 
     webpush.setVapidDetails(subject, publicKey, privateKey);
 
-    const subscriptions = await ctx.runQuery(
-      internal.notifications.internalQueries.getSubscriptionsByUserId,
+    const activeSubscriptions = await ctx.runQuery(
+      internal.tables.push_alerts_subscriptions.internalQueries
+        .getActiveSubscriptionsByUserId,
       {
         userId: args.userId,
       },
@@ -46,13 +48,13 @@ export const sendPushNotification = internalAction({
     });
 
     const results = await Promise.allSettled(
-      subscriptions.map((subscription) =>
+      activeSubscriptions.map(({ subscription }) =>
         webpush.sendNotification(
           {
-            endpoint: subscription.endpoint,
+            endpoint: subscription?.endpoint ?? "",
             keys: {
-              p256dh: subscription.p256dh,
-              auth: subscription.auth,
+              p256dh: subscription?.keys?.p256dh ?? "",
+              auth: subscription?.keys?.auth ?? "",
             },
           },
           payload,

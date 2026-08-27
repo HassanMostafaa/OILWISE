@@ -8,7 +8,7 @@ import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@oilwise-v1/backend/convex/_generated/api";
 import { useRouter } from "next/navigation";
 
-export const NotificationToastSync = () => {
+export const NotificationToast = () => {
   const { userId } = useAuth();
   const { isAuthenticated } = useConvexAuth();
   const router = useRouter();

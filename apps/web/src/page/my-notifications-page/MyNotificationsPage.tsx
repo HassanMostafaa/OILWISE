@@ -1,6 +1,9 @@
-import { NotifTester } from "@/components/notif-tester/NotifTester";
-import React from "react";
+import { NotificationsList } from "@/components/notifications-list/NotificationsList";
 
 export const MyNotificationsPage = () => {
-  return <NotifTester />;
+  return (
+    <div>
+      <NotificationsList />
+    </div>
+  );
 };
