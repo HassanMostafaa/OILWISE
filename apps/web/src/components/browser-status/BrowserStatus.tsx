@@ -12,11 +12,13 @@ export const BrowserStatus = () => {
   const [registration, setRegistration] = useState<
     ServiceWorkerRegistration | null | undefined
   >(null);
+
   const [subscription, setSubscription] = useState<
     PushSubscription | null | undefined
   >(null);
-  const [permission, setPermission] = useState<NotificationPermission | null>(
-    Notification.permission,
+
+  const [permission, setPermission] = useState<NotificationPermission>(() =>
+    typeof Notification !== "undefined" ? Notification.permission : "default",
   );
 
   // TO BE USED UPON SUBSCRIBING
@@ -116,7 +118,7 @@ export const BrowserStatus = () => {
       <hr />
       <p className="flex flex-col gap-2">
         Permission: {JSON.stringify(permission)}{" "}
-        {permission !== "granted" && (
+        {permission === "default" && (
           <button className="click" onClick={requestNotificationPermission}>
             Ask permission
           </button>

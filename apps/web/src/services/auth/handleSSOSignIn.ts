@@ -1,10 +1,31 @@
 import { SignInFutureResource } from "@clerk/nextjs/types";
-import { sign } from "crypto";
+import { ReactMutation } from "convex/react";
+import { FunctionReference } from "convex/server";
 
 interface ISSOAuthProps {
   signIn: SignInFutureResource;
   strategy: SSOProvider;
   redirectUrl: string;
+  browserId: string;
+  // updatePushAlertActiveState: ({
+  // browserId,
+  // active,
+  // }: {
+  // browserId: string;
+  // active: /boolean;
+  // }) => Promise<void>;
+  updatePushAlertActiveState: ReactMutation<
+    FunctionReference<
+      "mutation",
+      "public",
+      {
+        browserId: string;
+        active: boolean;
+      },
+      null,
+      string | undefined
+    >
+  >;
 }
 
 type SSOProvider = "oauth_google" | "oauth_github" | "oauth_apple";
@@ -13,6 +34,8 @@ export const handleSSOSignIn = async ({
   redirectUrl,
   signIn,
   strategy,
+  browserId,
+  updatePushAlertActiveState,
 }: ISSOAuthProps) => {
   let authWindow = window.open("", "clerk-sso", "width=500,height=650");
 
@@ -38,5 +61,6 @@ export const handleSSOSignIn = async ({
     console.error(error);
   } else {
     await signIn.finalize();
+    await updatePushAlertActiveState({ active: true, browserId });
   }
 };

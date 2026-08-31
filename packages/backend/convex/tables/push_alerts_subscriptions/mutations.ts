@@ -100,3 +100,67 @@ export const updatePushAlertsActiveState = mutation({
     });
   },
 });
+
+export const syncPushAlertSubscription = mutation({
+  args: {
+    browserId: v.string(),
+
+    subscription: v.object({
+      endpoint: v.optional(v.string()),
+      expirationTime: v.optional(v.union(v.number(), v.null())),
+      keys: v.optional(v.record(v.string(), v.string())),
+    }),
+  },
+
+  handler: async (ctx, args) => {
+    const user = await getAuthenticatedUser(ctx);
+
+    const endpoint = args.subscription.endpoint;
+    const p256dh = args.subscription.keys?.p256dh;
+    const auth = args.subscription.keys?.auth;
+
+    if (!endpoint || !p256dh || !auth) {
+      throw new Error("Invalid push subscription");
+    }
+
+    const subscription = {
+      endpoint,
+      expirationTime: args.subscription.expirationTime,
+      keys: {
+        p256dh,
+        auth,
+      },
+    };
+
+    const existingSubscription = await ctx.db
+      .query("pushAlertsSubscriptions")
+      .withIndex("by_browser_id_and_user_id", (q) =>
+        q.eq("browserId", args.browserId).eq("userId", user._id),
+      )
+      .unique();
+
+    if (existingSubscription) {
+      await ctx.db.patch(existingSubscription._id, {
+        subscription,
+        active: true,
+      });
+
+      return {
+        created: false,
+        subscriptionId: existingSubscription._id,
+      };
+    }
+
+    const subscriptionId = await ctx.db.insert("pushAlertsSubscriptions", {
+      browserId: args.browserId,
+      userId: user._id,
+      active: true,
+      subscription,
+    });
+
+    return {
+      created: true,
+      subscriptionId,
+    };
+  },
+});
