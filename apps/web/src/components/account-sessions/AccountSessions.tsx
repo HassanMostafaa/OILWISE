@@ -106,11 +106,12 @@ export const AccountSessions = async ({
           )}
         </article>
       ))}
-      {hasPreviousPage && (
+
+      {/* {hasPreviousPage && (
         <Link href={`?status=${status}&offset=${previousOffset}`}>
           Previous
         </Link>
-      )}
+      )} */}
 
       {hasNextPage && (
         <Link href={`?status=${status}&offset=${nextOffset}`}>Next</Link>
