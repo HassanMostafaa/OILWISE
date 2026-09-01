@@ -10,19 +10,16 @@ export const HeaderNav = async () => {
     <header className="flex items-center justify-evenly">
       <Link href="/">Home</Link>
 
-      <Show when="signed-in">
+      <Show when="signed-in" fallback={null}>
         <DashboardAccess />
 
         <Link href="/tester">Tester</Link>
 
-        <SignOut />
-      </Show>
-
-      <Show when="signed-in" fallback={null}>
         <NotificationBell />
         <Link href="/profile">
           <UserAvatar />
         </Link>
+        <SignOut />
       </Show>
 
       <Show when="signed-out">

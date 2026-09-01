@@ -26,10 +26,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex justify-between flex-col">
+      <body className="h-full flex justify-between flex-col">
         <AppProviders>
           <HeaderNav />
-          <main className="flex-1 h-full flex flex-col justify-center items-center">
+          <main className="flex-1 flex flex-col justify-center items-center">
             {children}
           </main>
           <FooterNav />

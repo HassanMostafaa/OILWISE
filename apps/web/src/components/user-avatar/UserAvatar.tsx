@@ -27,9 +27,8 @@ export const UserAvatar = () => {
     <Image
       src={user.imageUrl}
       alt={user.fullName ?? "User avatar"}
-      width={32}
-      height={32}
-      className="size-8 rounded-full object-cover"
+      width={42}
+      height={42}
     />
   );
 };

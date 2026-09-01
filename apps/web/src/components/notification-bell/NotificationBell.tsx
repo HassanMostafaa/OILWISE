@@ -20,16 +20,14 @@ export const NotificationBell = () => {
     <Link href="/my-notifications">
       <button
         type="button"
-        className="relative click px-2!"
         aria-label="Notifications"
         disabled={isLoading}
+        className="text-xs flex"
       >
-        <Bell className="size-5" />
+        <Bell />
 
         {!isLoading && unseenCount && unseenCount > 0 ? (
-          <div className="absolute -right-2 -top-2 flex min-w-5 items-center justify-center rounded-full border px-1 text-xs">
-            {unseenCount > 99 ? "99+" : unseenCount}
-          </div>
+          <>{unseenCount > 99 ? "99+" : unseenCount}</>
         ) : null}
       </button>
     </Link>
