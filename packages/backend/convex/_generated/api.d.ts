@@ -13,6 +13,7 @@ import type * as notifications from "../notifications.js";
 import type * as notifications_actions from "../notifications/actions.js";
 import type * as notifications_api from "../notifications/api.js";
 import type * as notifications_client from "../notifications/client.js";
+import type * as notifications_internalMutations from "../notifications/internalMutations.js";
 import type * as notifications_mutations from "../notifications/mutations.js";
 import type * as tables_numbers_mutations from "../tables/numbers/mutations.js";
 import type * as tables_numbers_queries from "../tables/numbers/queries.js";
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   "notifications/actions": typeof notifications_actions;
   "notifications/api": typeof notifications_api;
   "notifications/client": typeof notifications_client;
+  "notifications/internalMutations": typeof notifications_internalMutations;
   "notifications/mutations": typeof notifications_mutations;
   "tables/numbers/mutations": typeof tables_numbers_mutations;
   "tables/numbers/queries": typeof tables_numbers_queries;

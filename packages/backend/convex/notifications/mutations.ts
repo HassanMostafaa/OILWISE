@@ -1,8 +1,22 @@
-import { mutation } from "../_generated/server";
-import { internal } from "../_generated/api";
+// packages/backend/convex/notifications/mutations.ts
+
 import { v } from "convex/values";
 
-import { notificationAction, notifications } from "./client";
+import { mutation } from "../_generated/server";
+import { internal } from "../_generated/api";
+import { notificationAction } from "./client";
+
+type SendNotificationResult = {
+  notificationId: unknown;
+  delivery: {
+    inApp: boolean;
+    browserPush: {
+      available: boolean;
+      subscriptionCount: number;
+      scheduled: boolean;
+    };
+  };
+};
 
 export const sendNotification = mutation({
   args: {
@@ -12,64 +26,30 @@ export const sendNotification = mutation({
     action: notificationAction,
   },
 
-  handler: async (ctx, args) => {
-    const targetUser = await ctx.db.get(args.userId);
+  handler: async (ctx, args): Promise<SendNotificationResult> => {
+    return ctx.runMutation(
+      internal.notifications.internalMutations.sendNotificationInternal,
+      args,
+    );
+  },
+});
 
-    if (!targetUser) {
-      throw new Error("Target user not found");
-    }
+export const scheduleNotification = mutation({
+  args: {
+    userId: v.id("users"),
+    title: v.string(),
+    message: v.string(),
+    action: notificationAction,
+    scheduledAt: v.number(),
+  },
 
-    // 1. Create in-app notification
-    const notificationId = await notifications.create(ctx, {
-      targetId: targetUser.clerkUserId,
+  handler: async (ctx, args): Promise<string> => {
+    const { scheduledAt, ...notification } = args;
 
-      kind: "reminder",
-
-      data: {
-        title: args.title,
-        message: args.message,
-        mileage: 9999999,
-        userId: targetUser._id,
-        action: args.action,
-      },
-    });
-
-    // 2. Check whether this user has any active browser subscriptions
-    const activeSubscriptions = await ctx.db
-      .query("pushAlertsSubscriptions")
-      .withIndex("by_user_id_and_active", (q) =>
-        q.eq("userId", targetUser._id).eq("active", true),
-      )
-      .collect();
-
-    const hasBrowserPush = activeSubscriptions.length > 0;
-
-    // 3. Schedule browser push delivery
-    if (hasBrowserPush) {
-      await ctx.scheduler.runAfter(
-        0,
-        internal.notifications.actions.sendPushNotification,
-        {
-          userId: targetUser._id,
-          title: args.title,
-          message: args.message,
-          action: args.action,
-        },
-      );
-    }
-
-    return {
-      notificationId,
-
-      delivery: {
-        inApp: true,
-
-        browserPush: {
-          available: hasBrowserPush,
-          subscriptionCount: activeSubscriptions.length,
-          scheduled: hasBrowserPush,
-        },
-      },
-    };
+    return ctx.scheduler.runAt(
+      scheduledAt,
+      internal.notifications.internalMutations.sendNotificationInternal,
+      notification,
+    );
   },
 });
