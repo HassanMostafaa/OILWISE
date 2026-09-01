@@ -14,11 +14,7 @@ export const AppProviders: FunctionComponent<PropsWithChildren> = ({
   children,
 }) => {
   return (
-    <ClerkProvider
-      appearance={{
-        theme: dark,
-      }}
-    >
+    <ClerkProvider>
       <ConvexClientProvider>
         {children}
 

@@ -8,7 +8,6 @@ const PAGE_SIZE = 10;
 type SessionStatus =
   | "abandoned"
   | "active"
-  | "pending"
   | "ended"
   | "expired"
   | "removed"
@@ -17,7 +16,6 @@ type SessionStatus =
 
 const allowedStatuses: SessionStatus[] = [
   "active",
-  "pending",
   "ended",
   "expired",
   "removed",
@@ -26,7 +24,9 @@ const allowedStatuses: SessionStatus[] = [
   "abandoned",
 ];
 
-type SessionStatusFilter = (typeof allowedStatuses)[number] | "all";
+type SessionStatusFilter = SessionStatus | "all";
+
+const filters: SessionStatusFilter[] = ["all", ...allowedStatuses];
 
 export const AccountSessions = async ({
   searchParams,
@@ -47,26 +47,36 @@ export const AccountSessions = async ({
   const offset = Number(offsetParam ?? 0);
 
   const status: SessionStatusFilter = allowedStatuses.includes(
-    statusParam as (typeof allowedStatuses)[number],
+    statusParam as SessionStatus,
   )
-    ? (statusParam as SessionStatusFilter)
+    ? (statusParam as SessionStatus)
     : "all";
 
   const client = await clerkClient();
 
-  const { data: sessions, totalCount } = await client.sessions.getSessionList({
-    userId,
-    limit: PAGE_SIZE,
-    offset,
-    ...(status !== "all"
-      ? {
+  const result =
+    status === "all"
+      ? await client.sessions.getSessionList({
+          userId,
+          limit: PAGE_SIZE,
+          offset,
+        })
+      : await client.sessions.getSessionList({
+          userId,
+          limit: PAGE_SIZE,
+          offset,
           status,
-        }
-      : {}),
-  });
+        });
+
+  const { data: sessions, totalCount } = result;
+
+  console.log({ sessions, status });
 
   const nextOffset = offset + PAGE_SIZE;
+  const previousOffset = Math.max(0, offset - PAGE_SIZE);
+
   const hasNextPage = nextOffset < totalCount;
+  const hasPreviousPage = offset > 0;
 
   const currentPage = Math.floor(offset / PAGE_SIZE) + 1;
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
@@ -79,11 +89,15 @@ export const AccountSessions = async ({
       <h1>Account Sessions</h1>
 
       <nav>
-        <Link href="?status=all">All</Link>{" "}
-        <Link href="?status=active">Active</Link>{" "}
-        <Link href="?status=replaced">Replaced</Link>{" "}
-        <Link href="?status=removed">Removed</Link>
+        {filters.map((filter) =>
+          status !== filter ? (
+            <Link key={filter} href={`?status=${filter}&offset=0`}>
+              <button disabled={status === filter}>{filter}</button>
+            </Link>
+          ) : null,
+        )}
       </nav>
+
       <p>
         Showing {from}-{to} of {totalCount} · Page {currentPage} of {totalPages}
       </p>
@@ -91,12 +105,11 @@ export const AccountSessions = async ({
       {sessions.map((session) => (
         <article key={session.id}>
           <p>
-            {session.id}
+            Session ID: {session.id}
             {session.id === sessionId && " — CURRENT"}
           </p>
 
           <p>Status: {session.status}</p>
-
           {session.status === "active" && (
             <form action={revokeSession}>
               <input type="hidden" name="sessionId" value={session.id} />
@@ -107,14 +120,16 @@ export const AccountSessions = async ({
         </article>
       ))}
 
-      {/* {hasPreviousPage && (
+      {hasPreviousPage && (
         <Link href={`?status=${status}&offset=${previousOffset}`}>
-          Previous
+          <button>Previous</button>
         </Link>
-      )} */}
+      )}
 
       {hasNextPage && (
-        <Link href={`?status=${status}&offset=${nextOffset}`}>Next</Link>
+        <Link href={`?status=${status}&offset=${nextOffset}`}>
+          <button>Next</button>
+        </Link>
       )}
     </section>
   );
