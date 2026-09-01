@@ -1,24 +1,45 @@
 "use client";
 
+import { useClerk } from "@clerk/nextjs";
+import { useConvexAuth } from "convex/react";
+
 import { useUpdatePushAlertActiveState } from "@/services/push-alert-subscriptions/hooks/updatePushAlertActiveState";
 import { getBrowserId } from "@/utils/getBrowserId";
-import { useClerk } from "@clerk/nextjs";
 
 export const SignOut = () => {
   const { signOut } = useClerk();
-  const updatePushAlertActiveState = useUpdatePushAlertActiveState();
-  const browserId = getBrowserId() ?? "";
 
-  // UPON SIGNOUT UPDATE PUSH ALERT ACTIVE STATE
-  const active = false;
+  const { isAuthenticated, isLoading } = useConvexAuth();
+
+  const updatePushAlertActiveState = useUpdatePushAlertActiveState();
 
   const handleSignOut = async () => {
-    await updatePushAlertActiveState({ active, browserId });
+    if (isLoading || !isAuthenticated) return;
+
+    const browserId = getBrowserId();
+
+    if (!browserId) return;
+
+    const registration = await navigator.serviceWorker.getRegistration();
+
+    const subscription = await registration?.pushManager.getSubscription();
+
+    await updatePushAlertActiveState({
+      browserId,
+      active: false,
+      subscription: subscription?.toJSON(),
+    });
+
     await signOut();
   };
 
   return (
-    <button className="border px-4 py-2" type="button" onClick={handleSignOut}>
+    <button
+      // className="border px-4 py-2"
+      type="button"
+      disabled={isLoading || !isAuthenticated}
+      onClick={handleSignOut}
+    >
       Sign out
     </button>
   );

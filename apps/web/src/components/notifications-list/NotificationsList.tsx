@@ -12,7 +12,7 @@ export const NotificationsList = () => {
   if (isLoading) return <p>Loading...</p>;
 
   return (
-    <div className="flex gap-5 flex-wrap">
+    <div className="flex flex-wrap justify-center">
       {notifications?.map((notification) => (
         <NotificationCard key={notification._id} {...notification} />
       ))}

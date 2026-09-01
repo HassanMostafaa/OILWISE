@@ -7,7 +7,7 @@ export const getAuthenticatedUser = async (ctx: AuthContext) => {
   const identity = await ctx.auth.getUserIdentity();
 
   if (!identity) {
-    throw new Error("Not authenticated");
+    throw new Error("Not authenticated - must be clerk user");
   }
 
   const user = await ctx.db

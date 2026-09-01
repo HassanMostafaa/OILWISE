@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+/* 
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -25,14 +25,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-input {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 8px;
-  font-size: 14px;
-  width: 100%;
-}
-
 .click {
   cursor: pointer;
   border: 1px solid #ccc;
@@ -52,4 +44,12 @@ input {
 .click:disabled:hover,
 .click:disabled:active {
   transform: scale(1);
+} */
+
+input,
+button,
+article {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
 }

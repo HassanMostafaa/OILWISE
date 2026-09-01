@@ -2,7 +2,7 @@ const BROWSER_ID_KEY = "oilwise_browser_id";
 
 export const getBrowserId = () => {
   if (typeof window === "undefined") {
-    return null;
+    return "";
   }
 
   let browserId = window.localStorage.getItem(BROWSER_ID_KEY);
@@ -13,5 +13,6 @@ export const getBrowserId = () => {
     window.localStorage.setItem(BROWSER_ID_KEY, browserId);
   }
 
-  return browserId;
+  if (browserId) return browserId;
+  return "";
 };

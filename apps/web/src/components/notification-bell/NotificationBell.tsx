@@ -27,7 +27,7 @@ export const NotificationBell = () => {
         <Bell className="size-5" />
 
         {!isLoading && unseenCount && unseenCount > 0 ? (
-          <div className="absolute -right-2 -top-2 flex min-w-5 items-center justify-center rounded-full border bg-background px-1 text-xs">
+          <div className="absolute -right-2 -top-2 flex min-w-5 items-center justify-center rounded-full border px-1 text-xs">
             {unseenCount > 99 ? "99+" : unseenCount}
           </div>
         ) : null}

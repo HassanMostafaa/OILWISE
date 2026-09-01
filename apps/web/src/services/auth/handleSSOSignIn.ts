@@ -7,13 +7,7 @@ interface ISSOAuthProps {
   strategy: SSOProvider;
   redirectUrl: string;
   browserId: string;
-  // updatePushAlertActiveState: ({
-  // browserId,
-  // active,
-  // }: {
-  // browserId: string;
-  // active: /boolean;
-  // }) => Promise<void>;
+
   updatePushAlertActiveState: ReactMutation<
     FunctionReference<
       "mutation",
@@ -21,6 +15,11 @@ interface ISSOAuthProps {
       {
         browserId: string;
         active: boolean;
+        subscription?: {
+          endpoint?: string;
+          expirationTime?: number | null;
+          keys?: Record<string, string>;
+        };
       },
       null,
       string | undefined
@@ -29,7 +28,6 @@ interface ISSOAuthProps {
 }
 
 type SSOProvider = "oauth_google" | "oauth_github" | "oauth_apple";
-
 export const handleSSOSignIn = async ({
   redirectUrl,
   signIn,
@@ -39,7 +37,6 @@ export const handleSSOSignIn = async ({
 }: ISSOAuthProps) => {
   let authWindow = window.open("", "clerk-sso", "width=500,height=650");
 
-  // Popup blocked → try a normal new tab
   if (!authWindow) {
     authWindow = window.open("", "_blank");
   }
@@ -59,8 +56,19 @@ export const handleSSOSignIn = async ({
   if (error) {
     authWindow.close();
     console.error(error);
-  } else {
-    await signIn.finalize();
-    await updatePushAlertActiveState({ active: true, browserId });
+    return;
   }
+
+  await signIn.finalize();
+
+  const registration = await navigator.serviceWorker.getRegistration();
+
+  const subscription = await registration?.pushManager.getSubscription();
+  console.log({ sub: subscription?.toJSON() });
+
+  await updatePushAlertActiveState({
+    active: true,
+    browserId,
+    subscription: subscription?.toJSON(),
+  });
 };

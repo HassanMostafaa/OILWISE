@@ -4,26 +4,19 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSignIn } from "@clerk/nextjs";
 import { Eye, EyeClosed } from "lucide-react";
+import { FaApple, FaGithub, FaGoogle } from "react-icons/fa";
+
 import { FormInputErrorMessage } from "../form-input-error-message/FormInputErrorMessage";
 import { useRedirectUrl } from "@/hooks/useRedirectUrl";
 import { handleSSOSignIn } from "@/services/auth/handleSSOSignIn";
-import { FaApple, FaGithub, FaGoogle } from "react-icons/fa";
 import { useUpdatePushAlertActiveState } from "@/services/push-alert-subscriptions/hooks/updatePushAlertActiveState";
 import { getBrowserId } from "@/utils/getBrowserId";
+import { urlBase64ToUint8Array } from "@/utils/urlBase64ToUint8Array";
 
 const ssoProviders = [
-  {
-    strategy: "oauth_google",
-    icon: FaGoogle,
-  },
-  {
-    strategy: "oauth_github",
-    icon: FaGithub,
-  },
-  {
-    strategy: "oauth_apple",
-    icon: FaApple,
-  },
+  { strategy: "oauth_google", icon: FaGoogle },
+  { strategy: "oauth_github", icon: FaGithub },
+  { strategy: "oauth_apple", icon: FaApple },
 ] as const;
 
 export interface ILoginFormValues {
@@ -40,12 +33,10 @@ export const SignInForm = () => {
   const form = useForm<ILoginFormValues>({ defaultValues });
   const [hidePassword, setHidePassword] = useState(true);
 
-  const updatePushAlertActiveState = useUpdatePushAlertActiveState();
-  const browserId = getBrowserId() ?? "";
-
+  const { signIn, fetchStatus, errors } = useSignIn();
   const { redirectUrl, redirect } = useRedirectUrl();
 
-  const { signIn, fetchStatus, errors } = useSignIn();
+  const updatePushAlertActiveState = useUpdatePushAlertActiveState();
 
   const onSubmit = async ({ identifier, password }: ILoginFormValues) => {
     const { error } = await signIn.password({
@@ -53,51 +44,62 @@ export const SignInForm = () => {
       password,
     });
 
-    if (error) return;
+    if (error || signIn.status !== "complete") return;
 
-    if (signIn.status === "complete") {
-      await signIn.finalize();
-      await updatePushAlertActiveState({ active: true, browserId });
+    await signIn.finalize();
+
+    const registration = await navigator.serviceWorker.getRegistration();
+
+    if (!registration) {
       redirect();
+      return;
     }
+
+    let subscription = await registration.pushManager.getSubscription();
+
+    if (!subscription && Notification.permission === "granted") {
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(
+          process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "",
+        ),
+      });
+    }
+
+    if (subscription) {
+      await updatePushAlertActiveState({
+        active: true,
+        browserId: getBrowserId() ?? "",
+        subscription: subscription.toJSON(),
+      });
+    }
+
+    redirect();
   };
 
   return (
-    <form
-      className="border max-w-2xl w-full border-gray-300 p-3 space-y-4"
-      onSubmit={form.handleSubmit(onSubmit)}
-    >
-      <div className="flex gap-2 items-center justify-center">
-        {ssoProviders.map(({ strategy, icon: Icon }) => (
-          <button
-            key={strategy}
-            type="button"
-            className="border px-4 py-2 flex-1"
-            onClick={async () => {
-              handleSSOSignIn({
-                signIn,
-                strategy,
-                redirectUrl,
-                browserId,
-                updatePushAlertActiveState,
-              });
-            }}
-          >
-            <Icon className="size-4 mx-auto" />
-          </button>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-gray-300" />
-        <span className="text-xs text-gray-500">OR</span>
-        <div className="h-px flex-1 bg-gray-300" />
-      </div>
-
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      {ssoProviders.map(({ strategy, icon: Icon }) => (
+        <button
+          key={strategy}
+          type="button"
+          onClick={() =>
+            handleSSOSignIn({
+              signIn,
+              strategy,
+              redirectUrl,
+              browserId: getBrowserId() ?? "",
+              updatePushAlertActiveState,
+            })
+          }
+        >
+          <Icon />
+        </button>
+      ))}
       <div>
         <input
           type="text"
-          placeholder="Enter your email address"
+          placeholder="Enter your email address or username"
           {...form.register("identifier", {
             required: "Email is required",
           })}
@@ -113,7 +115,6 @@ export const SignInForm = () => {
 
       <div className="relative">
         <input
-          className="w-full border pe-8"
           type={hidePassword ? "password" : "text"}
           placeholder="Enter your password"
           {...form.register("password", {
@@ -122,15 +123,11 @@ export const SignInForm = () => {
         />
 
         <button
+          className="absolute top-1/2  -translate-y-1/2"
           type="button"
-          onClick={() => setHidePassword((prev) => !prev)}
-          className="absolute right-2 top-1/2 -translate-y-1/2"
+          onClick={() => setHidePassword((value) => !value)}
         >
-          {hidePassword ? (
-            <Eye className="h-4 w-4" />
-          ) : (
-            <EyeClosed className="h-4 w-4" />
-          )}
+          {hidePassword ? <Eye /> : <EyeClosed />}
         </button>
 
         <FormInputErrorMessage
@@ -141,15 +138,9 @@ export const SignInForm = () => {
         />
       </div>
 
-      <button
-        className="border px-4 py-2"
-        type="submit"
-        disabled={fetchStatus === "fetching"}
-      >
+      <button type="submit" disabled={fetchStatus === "fetching"}>
         {fetchStatus === "fetching" ? "Logging in..." : "Login"}
       </button>
     </form>
-
-    // <SignIn />
   );
 };

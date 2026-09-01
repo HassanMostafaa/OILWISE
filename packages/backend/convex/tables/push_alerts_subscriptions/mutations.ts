@@ -79,41 +79,39 @@ export const deletePushAlertSubscription = mutation({
     await ctx.db.delete(subscription._id);
   },
 });
-
 export const updatePushAlertsActiveState = mutation({
   args: {
     browserId: v.string(),
     active: v.boolean(),
+
+    subscription: v.optional(
+      v.object({
+        endpoint: v.optional(v.string()),
+        expirationTime: v.optional(v.union(v.number(), v.null())),
+        keys: v.optional(v.record(v.string(), v.string())),
+      }),
+    ),
   },
+
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
-    const subscription = await ctx.db
+
+    const existingSubscription = await ctx.db
       .query("pushAlertsSubscriptions")
       .withIndex("by_browser_id_and_user_id", (q) =>
         q.eq("browserId", args.browserId).eq("userId", user._id),
       )
       .unique();
-    if (!subscription) return;
 
-    await ctx.db.patch(subscription._id, {
-      active: args?.active,
-    });
-  },
-});
+    if (!existingSubscription) return;
 
-export const syncPushAlertSubscription = mutation({
-  args: {
-    browserId: v.string(),
+    if (!args.subscription) {
+      await ctx.db.patch(existingSubscription._id, {
+        active: args.active,
+      });
 
-    subscription: v.object({
-      endpoint: v.optional(v.string()),
-      expirationTime: v.optional(v.union(v.number(), v.null())),
-      keys: v.optional(v.record(v.string(), v.string())),
-    }),
-  },
-
-  handler: async (ctx, args) => {
-    const user = await getAuthenticatedUser(ctx);
+      return;
+    }
 
     const endpoint = args.subscription.endpoint;
     const p256dh = args.subscription.keys?.p256dh;
@@ -123,44 +121,17 @@ export const syncPushAlertSubscription = mutation({
       throw new Error("Invalid push subscription");
     }
 
-    const subscription = {
-      endpoint,
-      expirationTime: args.subscription.expirationTime,
-      keys: {
-        p256dh,
-        auth,
+    await ctx.db.patch(existingSubscription._id, {
+      active: args.active,
+
+      subscription: {
+        endpoint,
+        expirationTime: args.subscription.expirationTime,
+        keys: {
+          p256dh,
+          auth,
+        },
       },
-    };
-
-    const existingSubscription = await ctx.db
-      .query("pushAlertsSubscriptions")
-      .withIndex("by_browser_id_and_user_id", (q) =>
-        q.eq("browserId", args.browserId).eq("userId", user._id),
-      )
-      .unique();
-
-    if (existingSubscription) {
-      await ctx.db.patch(existingSubscription._id, {
-        subscription,
-        active: true,
-      });
-
-      return {
-        created: false,
-        subscriptionId: existingSubscription._id,
-      };
-    }
-
-    const subscriptionId = await ctx.db.insert("pushAlertsSubscriptions", {
-      browserId: args.browserId,
-      userId: user._id,
-      active: true,
-      subscription,
     });
-
-    return {
-      created: true,
-      subscriptionId,
-    };
   },
 });

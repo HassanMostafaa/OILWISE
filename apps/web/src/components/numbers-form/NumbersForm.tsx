@@ -1,12 +1,15 @@
 "use client";
+
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { FormInputErrorMessage } from "../form-input-error-message/FormInputErrorMessage";
 import { useInsertNumberService } from "@/services/numbers/insertNumberService";
-import { toast } from "sonner";
 
 export interface INumbersFormValues {
   value: string;
 }
+
 const defaultValues = {
   value: "",
 };
@@ -17,41 +20,31 @@ export const NumbersForm = () => {
 
   const handleSubmit = async (data: INumbersFormValues) => {
     await insertNumberService(data);
+
     numbersForm.clearErrors();
     numbersForm.reset();
 
-    // Focus the input field after resetting
     setTimeout(() => {
       numbersForm.setFocus("value");
-      toast.success(`Value (${data.value}) is inserted`);
+      toast.success(`Value (${data.value}) is added`);
     }, 50);
   };
 
   return (
-    <form
-      className="border border-gray-300 p-3 space-y-3"
-      onSubmit={numbersForm.handleSubmit(async (data) => {
-        if (data.value === undefined) return;
-        await handleSubmit(data);
-      })}
-    >
-      <h1>Numbers form</h1>
-      <div className="space-y-1.5">
-        <input
-          type="text"
-          placeholder="Number"
-          {...numbersForm.register("value", {
-            required: "Is required",
-          })}
-        />
-        <FormInputErrorMessage
-          message={numbersForm.formState.errors.value?.message}
-        />
-      </div>
+    <form onSubmit={numbersForm.handleSubmit(handleSubmit)}>
+      <input
+        type="text"
+        placeholder="Number"
+        {...numbersForm.register("value", {
+          required: "Is required",
+        })}
+      />
 
-      <button className="border px-4 py-2" type="submit">
-        Submit
-      </button>
+      <FormInputErrorMessage
+        message={numbersForm.formState.errors.value?.message}
+      />
+
+      <button type="submit">Submit</button>
     </form>
   );
 };
